@@ -1,17 +1,15 @@
 ACLOCAL_AMFLAGS=-I m4
-AUTOMAKE_OPTIONS = foreign
-AM_DISTCHECK_CONFIGURE_FLAGS = --enable-test-cpp \
-			       --enable-test-perf \
-			       --enable-test-vald \
+AM_DISTCHECK_CONFIGURE_FLAGS = --enable-user-guides	\
+			       --enable-helper-linux	\
 			       --with-testdir
 
 #@with_platform@ works alone in subdir but not as part of a path???
 SUBDIRS = @platform_with_platform@ \
 	  helper \
-	  test \
 	  helper/test \
 	  doc \
-	  example
+	  example . \
+	  test
 
 @DX_RULES@
 

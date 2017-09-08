@@ -4,6 +4,8 @@
  * SPDX-License-Identifier:     BSD-3-Clause
  */
 
+#include "config.h"
+
 /**
  * @file
  *
@@ -252,7 +254,8 @@ static int pcapif_recv_pkt(pktio_entry_t *pktio_entry, int index ODP_UNUSED,
 			break;
 		}
 
-		packet_parse_l2(&pkt_hdr->p, pkt_len);
+		packet_parse_layer(pkt_hdr,
+				   pktio_entry->s.config.parser.layer);
 		pktio_entry->s.stats.in_octets += pkt_hdr->frame_len;
 
 		packet_set_ts(pkt_hdr, ts);

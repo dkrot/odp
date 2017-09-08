@@ -4,6 +4,8 @@
  * SPDX-License-Identifier:	BSD-3-Clause
  */
 
+#include "config.h"
+
 #include "odp_classification_testsuites.h"
 #include "classification.h"
 #include <odp_cunit_common.h>
@@ -24,7 +26,8 @@ static uint8_t IPV6_DST_ADDR[ODPH_IPV6ADDR_LEN] = {
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xFF, 0xFF, 10, 0, 0, 100
 };
 
-odp_pktio_t create_pktio(odp_queue_type_t q_type, odp_pool_t pool)
+odp_pktio_t create_pktio(odp_queue_type_t q_type, odp_pool_t pool,
+			 odp_bool_t cls_enable)
 {
 	odp_pktio_t pktio;
 	odp_pktio_param_t pktio_param;
@@ -50,6 +53,8 @@ odp_pktio_t create_pktio(odp_queue_type_t q_type, odp_pool_t pool)
 
 	odp_pktin_queue_param_init(&pktin_param);
 	pktin_param.queue_param.sched.sync = ODP_SCHED_SYNC_ATOMIC;
+	pktin_param.classifier_enable = cls_enable;
+	pktin_param.hash_enable = false;
 
 	if (odp_pktin_queue_config(pktio, &pktin_param)) {
 		fprintf(stderr, "pktin queue config failed.\n");
@@ -312,8 +317,7 @@ odp_packet_t create_packet(cls_packet_info_t pkt_info)
 		ip->src_addr = odp_cpu_to_be_32(addr);
 		ip->ver_ihl = ODPH_IPV4 << 4 | ODPH_IPV4HDR_IHL_MIN;
 		ip->id = odp_cpu_to_be_16(seqno);
-		ip->chksum = 0;
-		ip->chksum = odph_ipv4_csum_update(pkt);
+		odph_ipv4_csum_update(pkt);
 		ip->proto = next_hdr;
 		ip->tot_len = odp_cpu_to_be_16(l3_len);
 		ip->ttl = DEFAULT_TTL;

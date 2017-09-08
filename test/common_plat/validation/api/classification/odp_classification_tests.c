@@ -4,6 +4,8 @@
  * SPDX-License-Identifier:	BSD-3-Clause
  */
 
+#include "config.h"
+
 #include "odp_classification_testsuites.h"
 #include "classification.h"
 #include <odp_cunit_common.h>
@@ -52,6 +54,8 @@ int classification_suite_init(void)
 
 	odp_pktin_queue_param_init(&pktin_param);
 	pktin_param.queue_param.sched.sync = ODP_SCHED_SYNC_ATOMIC;
+	pktin_param.classifier_enable = true;
+	pktin_param.hash_enable = false;
 
 	if (odp_pktin_queue_config(pktio_loop, &pktin_param)) {
 		fprintf(stderr, "pktin queue config failed.\n");
@@ -235,8 +239,7 @@ void test_cls_pmr_chain(void)
 	ip = (odph_ipv4hdr_t *)odp_packet_l3_ptr(pkt, NULL);
 	parse_ipv4_string(CLS_PMR_CHAIN_SADDR, &addr, &mask);
 	ip->src_addr = odp_cpu_to_be_32(addr);
-	ip->chksum = 0;
-	ip->chksum = odph_ipv4_csum_update(pkt);
+	odph_ipv4_csum_update(pkt);
 
 	set_first_supported_pmr_port(pkt, CLS_PMR_CHAIN_PORT);
 
@@ -258,8 +261,7 @@ void test_cls_pmr_chain(void)
 	ip = (odph_ipv4hdr_t *)odp_packet_l3_ptr(pkt, NULL);
 	parse_ipv4_string(CLS_PMR_CHAIN_SADDR, &addr, &mask);
 	ip->src_addr = odp_cpu_to_be_32(addr);
-	ip->chksum = 0;
-	ip->chksum = odph_ipv4_csum_update(pkt);
+	odph_ipv4_csum_update(pkt);
 
 	enqueue_pktio_interface(pkt, pktio_loop);
 	pkt = receive_packet(&queue, ODP_TIME_SEC_IN_NS);
@@ -666,8 +668,7 @@ void test_pktio_pmr_composite_cos(void)
 	ip = (odph_ipv4hdr_t *)odp_packet_l3_ptr(pkt, NULL);
 	parse_ipv4_string(CLS_PMR_SET_SADDR, &addr, &mask);
 	ip->src_addr = odp_cpu_to_be_32(addr);
-	ip->chksum = 0;
-	ip->chksum = odph_ipv4_csum_update(pkt);
+	odph_ipv4_csum_update(pkt);
 
 	set_first_supported_pmr_port(pkt, CLS_PMR_SET_PORT);
 	enqueue_pktio_interface(pkt, pktio_loop);

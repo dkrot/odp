@@ -15,14 +15,14 @@ AC_ARG_WITH([netmap-path],
 AC_HELP_STRING([--with-netmap-path=DIR   path to netmap root directory],
                [(or in the default path if not specified).]),
     [NETMAP_PATH=$withval
-    AM_CPPFLAGS="$AM_CPPFLAGS -isystem $NETMAP_PATH/sys"
+    NETMAP_CPPFLAGS="-isystem $NETMAP_PATH/sys"
     netmap_support=yes],[])
 
 ##########################################################################
 # Save and set temporary compilation flags
 ##########################################################################
 OLD_CPPFLAGS=$CPPFLAGS
-CPPFLAGS="$AM_CPPFLAGS $CPPFLAGS"
+CPPFLAGS="$NETMAP_CPPFLAGS $CPPFLAGS"
 
 ##########################################################################
 # Check for netmap availability
@@ -31,7 +31,9 @@ if test x$netmap_support = xyes
 then
     AC_CHECK_HEADERS([net/netmap_user.h], [],
         [AC_MSG_FAILURE(["can't find netmap header"])])
-    ODP_CFLAGS="$ODP_CFLAGS -DODP_NETMAP"
+    AC_DEFINE([ODP_NETMAP], [1],
+	      [Define to 1 to enable netmap IO support])
+    AC_SUBST([NETMAP_CPPFLAGS])
 else
     netmap_support=no
 fi
@@ -40,3 +42,5 @@ fi
 # Restore old saved variables
 ##########################################################################
 CPPFLAGS=$OLD_CPPFLAGS
+
+AM_CONDITIONAL([netmap_support], [test x$netmap_support = xyes ])

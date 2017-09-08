@@ -4,6 +4,8 @@
  * SPDX-License-Identifier:     BSD-3-Clause
  */
 
+#include "config.h"
+
 /**
  * @file
  *
@@ -22,7 +24,7 @@
 #include <inttypes.h>
 
 #include <test_debug.h>
-#include <dummy_crc.h>
+#include "dummy_crc.h"
 
 #include <odp_api.h>
 #include <odp/helper/threads.h>
@@ -586,6 +588,7 @@ static int create_pktio(const char *dev, int idx, int num_rx, int num_tx,
 	odp_pktio_t pktio;
 	odp_pktio_param_t pktio_param;
 	odp_pktio_capability_t capa;
+	odp_pktio_config_t config;
 	odp_pktin_queue_param_t pktin_param;
 	odp_pktout_queue_param_t pktout_param;
 	odp_pktio_op_mode_t mode_rx;
@@ -610,6 +613,10 @@ static int create_pktio(const char *dev, int idx, int num_rx, int num_tx,
 		odp_pktio_close(pktio);
 		return -1;
 	}
+
+	odp_pktio_config_init(&config);
+	config.parser.layer = ODP_PKTIO_PARSER_LAYER_L2;
+	odp_pktio_config(pktio, &config);
 
 	odp_pktin_queue_param_init(&pktin_param);
 	odp_pktout_queue_param_init(&pktout_param);

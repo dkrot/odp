@@ -5,6 +5,8 @@
  * SPDX-License-Identifier:     BSD-3-Clause
  */
 
+#include "config.h"
+
 #include <odp_posix_extensions.h>
 
 #include <odp_packet_io_internal.h>
@@ -231,7 +233,8 @@ static inline unsigned pkt_mmap_v2_rx(pktio_entry_t *pktio_entry,
 		if (pktio_cls_enabled(pktio_entry))
 			copy_packet_cls_metadata(&parsed_hdr, hdr);
 		else
-			packet_parse_l2(&hdr->p, pkt_len);
+			packet_parse_layer(hdr,
+					   pktio_entry->s.config.parser.layer);
 
 		packet_set_ts(hdr, ts);
 
@@ -354,9 +357,9 @@ static void mmap_fill_ring(struct ring *ring, odp_pool_t pool_hdl, int fanout)
 	pool = pool_entry_from_hdl(pool_hdl);
 
 	/* Frame has to capture full packet which can fit to the pool block.*/
-	ring->req.tp_frame_size = (pool->data_size +
-				   TPACKET_HDRLEN + TPACKET_ALIGNMENT +
-				   + (pz - 1)) & (-pz);
+	ring->req.tp_frame_size = (pool->headroom + pool->data_size +
+				   pool->tailroom + TPACKET_HDRLEN +
+				   TPACKET_ALIGNMENT + + (pz - 1)) & (-pz);
 
 	/* Calculate how many pages do we need to hold all pool packets
 	*  and align size to page boundary.

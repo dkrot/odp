@@ -16,6 +16,8 @@ AM_CFLAGS += $(VISIBILITY_CFLAGS)
 #The implementation will need to retain the deprecated implementation
 AM_CFLAGS += -Wno-deprecated-declarations
 
+AM_CFLAGS += @PTHREAD_CFLAGS@
+
 odpapispecincludedir= $(includedir)/odp/api/spec
 odpapispecinclude_HEADERS = \
 		  $(top_srcdir)/include/odp/api/spec/align.h \
@@ -57,8 +59,9 @@ odpapispecinclude_HEADERS = \
 		  $(top_srcdir)/include/odp/api/spec/ticketlock.h \
 		  $(top_srcdir)/include/odp/api/spec/time.h \
 		  $(top_srcdir)/include/odp/api/spec/timer.h \
-		  $(top_builddir)/include/odp/api/spec/version.h \
-		  $(top_srcdir)/include/odp/api/spec/traffic_mngr.h
+		  $(top_srcdir)/include/odp/api/spec/traffic_mngr.h \
+		  $(top_builddir)/include/odp/api/spec/deprecated.h \
+		  $(top_builddir)/include/odp/api/spec/version.h
 
 odpapiabidefaultincludedir= $(includedir)/odp/arch/default/api/abi
 odpapiabidefaultinclude_HEADERS = \
@@ -97,4 +100,6 @@ EXTRA_DIST = \
 	     arch/powerpc/odp_sysinfo_parse.c \
 	     arch/x86/odp/api/cpu_arch.h \
 	     arch/x86/odp_cpu_arch.c \
-	     arch/x86/odp_sysinfo_parse.c
+	     arch/x86/odp_sysinfo_parse.c \
+	     arch/x86/cpu_flags.c \
+	     arch/x86/cpu_flags.h
